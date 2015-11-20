@@ -1,0 +1,34 @@
+model{
+    for (i in 1:N){
+        for (j in 1:K){
+            mu[i, j] <- beta[j, 1] + beta[j, 2]*x[i]
+            y[i, j] ~ dnorm(mu[i, j], tau[j])
+        }
+    }
+
+    for (i in 1:N){
+        mu_x[i] <- alpha[level[i]]
+        x[i] ~ dnorm(mu_x[i], 1)
+    }
+    for (i in 1:M){
+        alpha[i] ~ dnorm(0, 1)
+    }
+    for (j in 1:K){
+        beta[j, 1:2] ~ dmnorm(g0, G0)
+        tau[j] ~ dgamma(1e-7, 1e-7)
+    }
+
+    # remap to identified parameters
+    sd_x <- sd(x)
+    mean_x <- mean(x)
+    for (i in 1:N){
+        country[i] <- (x[i] - mean_x) / sd_x
+    }
+    for (j in 1:K){
+        load[j] <- beta[j, 2] * sd_x
+        intercept[j] <- beta[j, 1] + beta[j, 2]*mean_x/sd_x
+    }
+    for (j in 1:M){
+        region[j] <- (alpha[j] - mean_x) / sd_x
+    }
+}
