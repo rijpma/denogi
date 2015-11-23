@@ -1,12 +1,14 @@
 rm(list=ls())
 options(stringsAsFactors=FALSE)
 setwd('~/downloads/data/denogi/')
-source('denogi_functions.r')
-source('denogi_data.r')
 
 library(rjags)
 library(RColorBrewer)
 library(maptools)
+library(countrycode)
+
+source('denogi_functions.r')
+source('denogi_data.r')
 
 mar <- c(4, 3, 3.5, 1)
 
@@ -83,7 +85,7 @@ for (i in 1:ncol(countries)){
     probs <- colSums(countries[, -i] > countries[, i]) / nrow(countries)
     ctrprobs[-i, i] <- probs
 }
-colnames(ctrprobs) <- rownames(ctrprobs) <- paste0(mp$iso3, mp$century)
+colnames(ctrprobs) <- rownames(ctrprobs) <- paste0(mp$country, mp$century)
 
 write.csv(regionprobs, 'regionprobs.csv')
 write.csv(ctrprobs, 'ctrprobs.csv')
