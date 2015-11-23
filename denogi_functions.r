@@ -1,3 +1,8 @@
+grepr <- function(pattern, x, ...){
+    idx <- grep(pattern, x, ...)
+    return(x[idx])
+}
+
 tablefix <- function(dat){
     fill <- NULL
     for (century in unique(centuries)){
