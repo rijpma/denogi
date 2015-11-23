@@ -1,7 +1,5 @@
 options(stringsAsFactors=FALSE)
 
-library(countrycode)
-
 celib <- read.table('denogi_celib.csv', skip=1, na.string='n/a', sep=',', header=T)
 smam <- read.table('denogi_smam.csv', skip=1, na.string='n/a', sep=',', header=T)
 cmplx <- read.table('denogi_complex.csv', skip=1, na.string='n/a', sep=',', header=T)
