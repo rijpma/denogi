@@ -1,0 +1,45 @@
+model{
+    for (i in 1:N){
+        for (t in 1:T){
+            for (j in 1:K){
+                mu[t, j, i] <- beta[j, 1] + beta[j, 2]*x[t, i]
+                y[t, j, i] ~ dnorm(mu[t, j, i], tau[j])
+            }
+        }
+    }
+
+    # transition
+    for (i in 1:N){
+        for (t in 2:T){
+            mu_x[t, i] <- gamma[1] + gamma[2]*x[t - 1, i]
+            x[t, i] ~ dnorm(mu_x[t, i], prec_sigma_x)
+        }
+    }
+    for (i in 1:N){
+        x[1, i] ~ dnorm(0, 0.0001) # initialisation
+    }
+
+    # priors
+    sigma_x ~ dunif(0, drift)
+    prec_sigma_x <- pow(sigma_x, -2)
+    gamma[1:2] ~ dmnorm(g0, G0)
+
+    for (j in 1:K){
+        beta[j, 1:2] ~ dmnorm(g0, G0)
+        tau[j] ~ dgamma(0.01, 0.01)
+        omega[j] <- 1/sqrt(tau[j])
+    }
+
+    # remapping
+    sd_x <- sd(x)
+    mean_x <- mean(x)
+    for (i in 1:N){
+        for (t in 1:T){
+            country[t, i] <- (x[t, i] - mean_x) / sd_x
+        }
+    }
+    for (j in 1:K){
+        load[j] <- beta[j, 2] * sd_x
+        intercept[j] <- beta[j, 1] + beta[j, 2]*mean_x/sd_x
+    }
+}
