@@ -16,6 +16,7 @@ model{
     for (j in 1:K){
         beta[j, 1:2] ~ dmnorm(g0, G0)
         tau[j] ~ dgamma(1e-7, 1e-7)
+        omega[j] <- 1/sqrt(tau[j])
     }
 
     # remap to identified parameters
