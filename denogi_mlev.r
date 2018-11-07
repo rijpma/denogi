@@ -50,7 +50,8 @@ ys <- extract_from_coda(smpls, '^y\\[')
 
 regionshat <- sumstatsDF(regions)
 regionshat$region <- vstrsplit(unique(as.character(levels)), ' c')[,1]
-regionshat$century <- as.factor(vstrsplit(unique(as.character(levels)), ' c')[,2])
+regionshat$century <- vstrsplit(unique(as.character(levels)), ' c')[,2]
+regionshat$century[regionshat$century == "10-5"] <- "10-15"
 
 loadshat <- sumstatsDF(loads)
 rownames(loadshat) <- c('Celibacy', 'SMAM', 'Complex HH')
@@ -129,14 +130,18 @@ data(wrld_simpl)
 c18 <- countrieshat[countrieshat$century=='c18', ]
 c18 <- aggregate(q50 ~ iso3, data=c18, mean)
 
-pdf('eumarpattern_c18.pdf')
+pdf('eumarpattern_c18.pdf', width = 9)
 cols = brewer.pal(5, "RdPu")
 wrld_simpl@data <- data.frame(wrld_simpl@data, 
     c18[match(wrld_simpl@data$ISO3, c18$iso3), ])
 eur_simpl <- wrld_simpl[!is.na(wrld_simpl@data$iso3), ]
-eur_simpl@data$col <- as.character(factor(cut(eur_simpl@data$q50, breaks=5), labels=cols))
+eur_simpl@data$lvl <- cut(eur_simpl@data$q50, breaks=5)
+eur_simpl@data$col <- as.character(factor(eur_simpl@data$lvl, labels=cols))
 par(mfrow=c(1,1))
-plot(eur_simpl, col=eur_simpl$col, xlim=c(-10, 40), ylim=c(40, 70))
+plot(eur_simpl, col=eur_simpl$col, xlim=c(-10, 40), ylim=c(35, 70))
+colplt <-  unique(eur_simpl@data[, c("lvl", "col")])
+colplt <- colplt[order(colplt$lvl), ]
+legend("bottomleft", fill = colplt$col, legend = colplt$lvl, title = "Marriage pattern index")
 dev.off()
 
 pdf('impcheck.pdf')
